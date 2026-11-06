@@ -23,3 +23,8 @@ footer{padding:53px 7% 20px;background:#171717;color:#fff}.footer-main{max-width
 @media(max-width:380px){.topbar{font-size:6px}.brand-mark{font-size:24px}.brand-sub{letter-spacing:1px}.header-actions .wishlist-toggle{display:none}.hero h1{font-size:43px}.category-card{min-height:145px}.category-card b{font-size:17px}.product-grid{gap:22px 8px}.footer-bottom span:nth-child(2){display:none}}
 @media(hover:none){.quick-add{opacity:1;transform:none}.product-card:hover .product-image img{transform:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.favorite-button{position:absolute;top:9px;right:9px;width:33px;height:33px;display:grid;place-items:center;border:0;border-radius:50%;background:#ffffffed;color:#222;cursor:pointer;z-index:2}
+.favorite-button .material-symbols-outlined{font-size:19px}
+.favorite-button.is-favorite{color:#a54b4b}
+.favorite-button.is-favorite .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
