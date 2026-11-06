@@ -73,3 +73,7 @@
  .product-card:hover .product-image img{transform:none}
  .quick-add{opacity:1;transform:none}
 }
+
+/* Material icon reset: keep glyphs free from legacy button styling */
+.cart-button .cart-symbol,.cart-button .cart-label{background:transparent;color:inherit;border-radius:0;padding:0;margin:0}
+.menu-toggle .material-symbols-outlined{width:auto;height:auto;background:transparent;display:inline-flex}
