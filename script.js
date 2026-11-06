@@ -1,0 +1,43 @@
+const WHATSAPP_NUMBER = ""; // Isi dengan nomor WhatsApp bisnis, format internasional tanpa tanda +.
+const products = [
+  {id:1,name:"Essential Basic Tee",category:"Basic",price:89000,color:"Off White",tag:"BEST SELLER",image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=85",description:"Kaos basic untuk rotasi harian. Siluet clean dengan tampilan versatile."},
+  {id:2,name:"Classic Ringer Tee",category:"Basic",price:99000,color:"Cream / Black",tag:"NEW",image:"https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=800&q=85",description:"Sentuhan kontras pada kerah dan lengan untuk gaya kasual klasik."},
+  {id:3,name:"Daily Oversized Tee",category:"Oversize",price:119000,color:"Sand",tag:"POPULAR",image:"https://images.unsplash.com/photo-1527719327859-c6ce80353573?auto=format&fit=crop&w=800&q=85",description:"Potongan relaxed untuk tampilan santai dan effortless."},
+  {id:4,name:"Everyday Polo",category:"Polo",price:139000,color:"Black",tag:"",image:"https://images.unsplash.com/photo-1625910513413-5fc45e9e7e2b?auto=format&fit=crop&w=800&q=85",description:"Polo minimal dengan gaya rapi yang tetap nyaman."},
+  {id:5,name:"Pocket Basic Tee",category:"Basic",price:99000,color:"Stone",tag:"",image:"https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=800&q=85",description:"Basic tee dengan detail pocket yang sederhana."},
+  {id:6,name:"Long Sleeve Essential",category:"Long Sleeve",price:129000,color:"Charcoal",tag:"",image:"https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=800&q=85",description:"Layering essential untuk gaya yang clean sepanjang hari."},
+  {id:7,name:"Fullstrip Oversize",category:"Oversize",price:129000,color:"Natural",tag:"",image:"https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=800&q=85",description:"Statement casual dengan siluet loose yang mudah dipadukan."},
+  {id:8,name:"Soft Cotton Polo",category:"Polo",price:149000,color:"Ivory",tag:"",image:"https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=85",description:"Pilihan polo bernuansa minimal untuk tampilan sehari-hari."}
+];
+let activeCategory = "All";
+let cart = [];
+const $ = (selector) => document.querySelector(selector);
+const formatPrice = value => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(value);
+function renderProducts(){
+  const query = ($("#search-input")?.value || "").trim().toLowerCase();
+  const shown = products.filter(p => (activeCategory==="All" || p.category===activeCategory) && (p.name+" "+p.category+" "+p.color).toLowerCase().includes(query));
+  $("#product-grid").innerHTML = shown.length ? shown.map(p=>`<article class="product-card" data-id="${p.id}"><div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy">${p.tag?`<span class="product-tag">${p.tag}</span>`:""}<button class="quick-add" data-add="${p.id}">+ QUICK ADD</button></div><div class="product-info"><div><h3>${p.name}</h3><p>${p.color} · ${p.category}</p></div><span class="product-price">${formatPrice(p.price)}</span></div></article>`).join("") : '<p class="empty-cart">Produk tidak ditemukan. Coba kata kunci lain.</p>';
+}
+function addToCart(id){const item=cart.find(x=>x.id===id);item?item.qty++:cart.push({id,qty:1});renderCart();}
+function renderCart(){
+  const count=cart.reduce((sum,item)=>sum+item.qty,0);
+  const subtotal=cart.reduce((sum,item)=>sum+products.find(p=>p.id===item.id).price*item.qty,0);
+  $("#cart-count").textContent=count;$("#drawer-count").textContent="("+count+")";$("#cart-subtotal").textContent=formatPrice(subtotal);
+  $("#cart-items").innerHTML=cart.length?cart.map(item=>{const p=products.find(x=>x.id===item.id);return `<div class="cart-row"><img src="${p.image}" alt=""><div><h3>${p.name}</h3><p>${formatPrice(p.price)}</p><div class="qty-controls"><button data-qty="${p.id}" data-change="-1">−</button><span>${item.qty}</span><button data-qty="${p.id}" data-change="1">+</button></div></div><button class="remove-item" data-remove="${p.id}">REMOVE</button></div>`}).join(""):'<p class="empty-cart">Your bag is empty.</p>';
+}
+function openCart(open){$("#cart-drawer").classList.toggle("open",open);$("#drawer-backdrop").classList.toggle("open",open);$("#cart-drawer").setAttribute("aria-hidden",String(!open));}
+function openProduct(id){const p=products.find(x=>x.id===id);$("#modal-content").innerHTML=`<div class="modal-product"><img src="${p.image}" alt="${p.name}"><div class="modal-product-copy"><p class="eyebrow">${p.category.toUpperCase()} / V2N SUPPLY.CO</p><h2>${p.name}</h2><strong>${formatPrice(p.price)}</strong><p>${p.description}</p><p>Color: ${p.color}</p><label for="size-select">Select size</label><select id="size-select"><option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option></select><button class="button button-dark button-full" data-modal-add="${p.id}">ADD TO BAG +</button></div></div>`;$("#product-modal").classList.add("open");$("#product-modal").setAttribute("aria-hidden","false");}
+$("#product-grid").addEventListener("click",e=>{const add=e.target.closest("[data-add]");if(add){e.stopPropagation();addToCart(Number(add.dataset.add));add.textContent="ADDED ✓";setTimeout(()=>add.textContent="+ QUICK ADD",900);return;}const card=e.target.closest(".product-card");if(card)openProduct(Number(card.dataset.id));});
+$("#filters").addEventListener("click",e=>{const btn=e.target.closest("[data-category]");if(!btn)return;activeCategory=btn.dataset.category;document.querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x===btn));renderProducts();});
+$("#search-toggle").addEventListener("click",()=>{$("#search-panel").classList.toggle("open");$("#search-input").focus();});
+$("#search-close").addEventListener("click",()=>{$("#search-panel").classList.remove("open");$("#search-input").value="";renderProducts();});
+$("#search-input").addEventListener("input",renderProducts);
+$("#cart-toggle").addEventListener("click",()=>openCart(true));$("#cart-close").addEventListener("click",()=>openCart(false));$("#drawer-backdrop").addEventListener("click",()=>openCart(false));
+$("#cart-items").addEventListener("click",e=>{const qty=e.target.closest("[data-qty]");const remove=e.target.closest("[data-remove]");if(qty){const id=Number(qty.dataset.qty),item=cart.find(x=>x.id===id);item.qty+=Number(qty.dataset.change);if(item.qty<=0)cart=cart.filter(x=>x.id!==id);renderCart();}if(remove){cart=cart.filter(x=>x.id!==Number(remove.dataset.remove));renderCart();}});
+$("#product-modal").addEventListener("click",e=>{if(e.target.id==="product-modal"||e.target.id==="modal-close"){ $("#product-modal").classList.remove("open");$("#product-modal").setAttribute("aria-hidden","true");}const add=e.target.closest("[data-modal-add]");if(add){addToCart(Number(add.dataset.modalAdd));$("#product-modal").classList.remove("open");openCart(true);}});
+$("#modal-close").addEventListener("click",()=>{$("#product-modal").classList.remove("open");$("#product-modal").setAttribute("aria-hidden","true");});
+$("#checkout-button").addEventListener("click",()=>{if(!cart.length){alert("Keranjang masih kosong.");return;}if(!WHATSAPP_NUMBER){alert("Demo website: tambahkan nomor WhatsApp bisnis pada variabel WHATSAPP_NUMBER di file script.js sebelum menerima pesanan.");return;}const lines=cart.map(item=>{const p=products.find(x=>x.id===item.id);return `• ${p.name} x${item.qty} — ${formatPrice(p.price*item.qty)}`;});const total=cart.reduce((s,item)=>s+products.find(p=>p.id===item.id).price*item.qty,0);const message=encodeURIComponent("Halo V2N SUPPLY.CO, saya ingin memesan:\n"+lines.join("\n")+"\n\nTotal: "+formatPrice(total));window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+message,"_blank","noopener");});
+$("#contact-link").addEventListener("click",e=>{if(!WHATSAPP_NUMBER){e.preventDefault();alert("Tambahkan nomor WhatsApp bisnis pada variabel WHATSAPP_NUMBER di script.js.");}else{$("#contact-link").href="https://wa.me/"+WHATSAPP_NUMBER;}});
+$("#menu-toggle").addEventListener("click",()=>{const nav=$(".desktop-nav");const open=nav.style.display==="flex";nav.style.display=open?"none":"flex";if(!open){nav.style.position="absolute";nav.style.top="65px";nav.style.left="0";nav.style.right="0";nav.style.padding="22px 5%";nav.style.background="var(--paper)";nav.style.flexDirection="column";nav.style.borderBottom="1px solid var(--line)";}});
+$("#year").textContent=new Date().getFullYear();
+renderProducts();renderCart();
