@@ -28,3 +28,27 @@ footer{padding:53px 7% 20px;background:#171717;color:#fff}.footer-main{max-width
 .favorite-button .material-symbols-outlined{font-size:19px}
 .favorite-button.is-favorite{color:#a54b4b}
 .favorite-button.is-favorite .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
+
+
+/* V2N interaction polish: remove the default blue tap highlight on mobile */
+:where(a,button,[role="button"],input,select,textarea,summary,.category-card,.product-card,.quick-add,.favorite-button,.icon-button,.menu-toggle,.cart-button) {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(a,button,[role="button"],summary,.category-card,.product-card,.quick-add,.favorite-button,.icon-button,.menu-toggle,.cart-button):active {
+  color: inherit;
+}
+:where(button,.quick-add,.favorite-button,.icon-button,.menu-toggle,.cart-button):focus {
+  outline: none;
+}
+:where(a,button,input,select,textarea,summary,[role="button"]):focus-visible {
+  outline: 2px solid #777;
+  outline-offset: 3px;
+}
+@media (hover: none) {
+  :where(a,button,[role="button"],summary,.category-card,.product-card,.quick-add,.favorite-button,.icon-button,.menu-toggle,.cart-button) {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :where(button,.quick-add,.favorite-button,.icon-button,.menu-toggle,.cart-button):active {
+    background-color: #eeeeec;
+  }
+}
