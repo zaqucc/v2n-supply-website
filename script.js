@@ -15,7 +15,7 @@ const products=[
 const $=s=>document.querySelector(s);
 const money=value=>new Intl.NumberFormat("id-ID",{style:"currency",currency:STORE_CONFIG.currency,maximumFractionDigits:0}).format(value);
 let category="All",cart=loadCart(),wishlist=loadWishlist(),showWishlist=false,toastTimer;
-function loadCart(){try{const v=JSON.parse(localStorage.getItem(STORE_CONFIG.storageKey)||"[]");return Array.isArray(v)?v.filter(x=>products.some(p=>p.id===x.id)&&Number.isInteger(x.qty)&&x.qty>0&&typeof x.size==="string"):[]}catch{return[]}}
+function loadCart(){try{const v=JSON.parse(localStorage.getItem(STORE_CONFIG.storageKey)||"[]");return Array.isArray(v)?v.filter(x=>{const p=products.find(item=>item.id===x.id);return p&&Number.isInteger(x.qty)&&x.qty>0&&p.sizes.includes(x.size)}):[]}catch{return[]}}
 function loadWishlist(){try{const v=JSON.parse(localStorage.getItem(STORE_CONFIG.wishlistKey)||"[]");return Array.isArray(v)?v.filter(id=>products.some(p=>p.id===id)):[]}catch{return[]}}
 function saveCart(){try{localStorage.setItem(STORE_CONFIG.storageKey,JSON.stringify(cart))}catch{showToast("Keranjang tidak dapat disimpan di perangkat ini.")}}
 function saveWishlist(){try{localStorage.setItem(STORE_CONFIG.wishlistKey,JSON.stringify(wishlist))}catch{showToast("Wishlist tidak dapat disimpan di perangkat ini.")}}
@@ -26,7 +26,7 @@ function renderProducts(){
  if(showWishlist)list=list.filter(p=>wishlist.includes(p.id));
  if(sort==="low")list.sort((a,b)=>a.price-b.price);if(sort==="high")list.sort((a,b)=>b.price-a.price);if(sort==="name")list.sort((a,b)=>a.name.localeCompare(b.name));
  $("#collection-count").textContent=String(list.length).padStart(2,"0")+" PRODUCTS";
- $("#product-grid").innerHTML=list.length?list.map(p=>`<article class="product-card" data-product="${p.id}"><div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">${p.tag?`<span class="product-tag">${p.tag}</span>`:""}<button class="favorite-button ${wishlist.includes(p.id)?"is-favorite":""}" type="button" data-favorite="${p.id}" aria-label="${wishlist.includes(p.id)?"Hapus dari":"Tambah ke"} wishlist"><span class="material-symbols-outlined">${wishlist.includes(p.id)?"favorite":"favorite_border"}</span></button><button class="quick-add" type="button" data-quick-add="${p.id}" aria-label="Tambah ${p.name} ukuran M ke keranjang">TAMBAH KE KERANJANG +</button></div><div class="product-info"><div><h3>${p.name}</h3><p>${p.color} · ${p.category}</p></div><span class="product-price">${money(p.price)}</span></div></article>`).join(""):'<p class="empty-results">Produk tidak ditemukan. Coba kata kunci atau kategori lain.</p>';
+ $("#product-grid").innerHTML=list.length?list.map(p=>`<article class="product-card" data-product="${p.id}"><div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">${p.tag?`<span class="product-tag">${p.tag}</span>`:""}<button class="favorite-button ${wishlist.includes(p.id)?"is-favorite":""}" type="button" data-favorite="${p.id}" aria-label="${wishlist.includes(p.id)?"Hapus dari":"Tambah ke"} wishlist"><span class="material-symbols-outlined">${wishlist.includes(p.id)?"favorite":"favorite_border"}</span></button><button class="quick-add" type="button" data-quick-add="${p.id}" aria-label="Pilih ukuran ${p.name}">PILIH UKURAN +</button></div><div class="product-info"><div><h3>${p.name}</h3><p>${p.color} · ${p.category}</p></div><span class="product-price">${money(p.price)}</span></div></article>`).join(""):'<p class="empty-results">Produk tidak ditemukan. Coba kata kunci atau kategori lain.</p>';
 }
 function addToCart(id,size="M"){const p=products.find(x=>x.id===id);if(!p)return;if(!p.sizes.includes(size)){showToast("Ukuran tidak tersedia untuk produk ini.");return}const item=cart.find(x=>x.id===id&&x.size===size);item?item.qty++:cart.push({id,size,qty:1});saveCart();renderCart();showToast(p.name+" · ukuran "+size+" ditambahkan.");}
 function toggleWishlist(id){wishlist=wishlist.includes(id)?wishlist.filter(x=>x!==id):[...wishlist,id];saveWishlist();renderProducts();showToast(wishlist.includes(id)?"Produk disimpan ke wishlist.":"Produk dihapus dari wishlist.");}
@@ -40,9 +40,10 @@ function openProduct(id){const p=products.find(x=>x.id===id);if(!p)return;$("#mo
 function closeProduct(){$("#product-modal").classList.remove("open");$("#product-modal").setAttribute("aria-hidden","true");document.body.classList.toggle("no-scroll",$("#cart-drawer").classList.contains("open"))}
 $("#product-grid").addEventListener("click",e=>{
  const fav=e.target.closest("[data-favorite]");if(fav){e.stopPropagation();toggleWishlist(Number(fav.dataset.favorite));return}
- const quick=e.target.closest("[data-quick-add]");if(quick){e.stopPropagation();const p=products.find(x=>x.id===Number(quick.dataset.quickAdd));addToCart(p.id,p.sizes.includes("M")?"M":p.sizes[0]);return}
+ const quick=e.target.closest("[data-quick-add]");if(quick){e.stopPropagation();openProduct(Number(quick.dataset.quickAdd));return}
  const card=e.target.closest("[data-product]");if(card)openProduct(Number(card.dataset.product));
 });
+$(".category-grid").addEventListener("click",e=>{const card=e.target.closest("[data-category]");if(!card)return;category=card.dataset.category;showWishlist=false;document.querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x.dataset.category===category));renderProducts()});
 $("#filters").addEventListener("click",e=>{const btn=e.target.closest("[data-category]");if(!btn)return;category=btn.dataset.category;showWishlist=false;document.querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x===btn));renderProducts()});
 $("#sort-select").addEventListener("change",renderProducts);
 $("#search-toggle").addEventListener("click",()=>{$("#search-panel").classList.toggle("open");if($("#search-panel").classList.contains("open"))$("#search-input").focus()});
