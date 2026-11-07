@@ -15,7 +15,7 @@ const products=[
 const $=s=>document.querySelector(s);
 const money=value=>new Intl.NumberFormat("id-ID",{style:"currency",currency:STORE_CONFIG.currency,maximumFractionDigits:0}).format(value);
 let category="All",cart=loadCart(),wishlist=loadWishlist(),showWishlist=false,toastTimer;
-function loadCart(){try{const v=JSON.parse(localStorage.getItem(STORE_CONFIG.storageKey)||"[]");return Array.isArray(v)?v.filter(x=>{const p=products.find(item=>item.id===x.id);return p&&Number.isInteger(x.qty)&&x.qty>0&&p.sizes.includes(x.size)}):[]}catch{return[]}}
+function loadCart(){try{const raw=localStorage.getItem(STORE_CONFIG.storageKey)||"[]",v=JSON.parse(raw);if(!Array.isArray(v))return[];const valid=v.filter(x=>{if(!x||typeof x!=="object"||Array.isArray(x))return false;const p=products.find(item=>item.id===Number(x.id));return Boolean(p)&&Number.isSafeInteger(x.qty)&&x.qty>0&&typeof x.size==="string"&&p.sizes.includes(x.size)});const merged=new Map();for(const item of valid){const id=Number(item.id),key=id+"|"+item.size,qty=Math.min(item.qty,999),current=merged.get(key);merged.set(key,{id,size:item.size,qty:Math.min(999,(current?.qty||0)+qty)})}return Array.from(merged.values())}catch{return[]}}
 function loadWishlist(){try{const v=JSON.parse(localStorage.getItem(STORE_CONFIG.wishlistKey)||"[]");return Array.isArray(v)?v.filter(id=>products.some(p=>p.id===id)):[]}catch{return[]}}
 function saveCart(){try{localStorage.setItem(STORE_CONFIG.storageKey,JSON.stringify(cart))}catch{showToast("Keranjang tidak dapat disimpan di perangkat ini.")}}
 function saveWishlist(){try{localStorage.setItem(STORE_CONFIG.wishlistKey,JSON.stringify(wishlist))}catch{showToast("Wishlist tidak dapat disimpan di perangkat ini.")}}
