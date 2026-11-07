@@ -1,0 +1,72 @@
+name: Extract uploaded assets
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "asset.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Extract ZIP safely
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import shutil
+
+          archive = Path("asset.zip")
+          destination = Path("asset-extracted")
+          if not archive.is_file():
+              raise SystemExit("asset.zip tidak ditemukan di root repository.")
+
+          if destination.exists():
+              shutil.rmtree(destination)
+          destination.mkdir(parents=True)
+
+          extracted = []
+          with ZipFile(archive) as zf:
+              for info in zf.infolist():
+                  name = info.filename.replace("\\\\", "/")
+                  target = (destination / name).resolve()
+                  if not target.is_relative_to(destination.resolve()):
+                      raise SystemExit(f"Path tidak aman di dalam ZIP: {info.filename}")
+                  if info.is_dir():
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with zf.open(info) as source, target.open("wb") as output:
+                      shutil.copyfileobj(source, output)
+                  extracted.append((name, info.file_size))
+
+          manifest = destination / "ASSET-MANIFEST.txt"
+          with manifest.open("w", encoding="utf-8") as f:
+              f.write("Daftar aset hasil ekstraksi asset.zip\\n")
+              f.write(f"Jumlah file: {len(extracted)}\\n\\n")
+              for name, size in extracted:
+                  f.write(f"{name} | {size:,} bytes\\n")
+          print(f"Berhasil mengekstrak {len(extracted)} file ke {destination}/")
+          PY
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add asset-extracted/
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan hasil ekstraksi."
+          else
+            git commit -m "Extract uploaded website assets"
+            git push origin HEAD:main
+          fi
