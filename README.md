@@ -1,6 +1,6 @@
-# V2N SUPPLY.CO — Storefront
+# V2N SUPPLY.CO — Storefront Demo
 
-Website toko online fashion berbasis HTML, CSS, dan JavaScript murni. Dibuat dengan pendekatan mobile-first dan tanpa framework agar ringan serta mudah dikembangkan.
+Website storefront fashion berbasis HTML, CSS, dan JavaScript murni. Proyek ini disiapkan sebagai demo portofolio dan fondasi pengembangan toko online V2N SUPPLY.CO.
 
 ## Struktur proyek
 
@@ -10,37 +10,48 @@ v2n-supply-website/
 ├── style.css
 ├── script.js
 ├── README.md
-└── assets/
+├── asset.zip
+└── asset-extracted/
+    ├── ASSET-MANIFEST.txt
+    └── asset/
+        └── ...foto produk hasil ekstraksi...
 ```
 
-## Fitur saat ini
+Struktur folder dipertahankan sesuai repositori saat ini.
 
-- Landing page editorial dan responsive untuk desktop maupun mobile.
-- Katalog produk berbasis data JavaScript.
-- Filter kategori, pencarian, dan pengurutan harga/nama.
-- Halaman detail produk dalam modal.
-- Pilihan ukuran per produk.
-- Keranjang dengan tambah/kurangi jumlah dan hapus item.
-- Keranjang tersimpan di browser menggunakan localStorage.
-- Checkout membentuk ringkasan pesanan melalui WhatsApp.
+## Fitur demo
+
+- Landing page responsive untuk desktop dan perangkat mobile.
+- Navigasi kategori yang mengarahkan ke katalog sekaligus menerapkan filter kategori.
+- Katalog produk dengan pencarian, filter, dan pengurutan.
+- Detail produk dengan pilihan ukuran sebelum ditambahkan ke keranjang.
+- Wishlist dan keranjang yang tersimpan secara lokal di browser.
+- Pengaturan jumlah dan penghapusan item keranjang.
+- Ringkasan pesanan melalui WhatsApp setelah nomor toko dikonfigurasi.
 - FAQ, navigasi mobile, notifikasi, dan dukungan reduced motion.
 
-## Menjalankan secara lokal
+## Menjalankan
 
-Buka `index.html` di browser atau jalankan menggunakan Live Server.
+Buka `index.html` melalui browser atau jalankan menggunakan Live Server.
 
-## Konfigurasi wajib sebelum menerima pesanan
+## Konfigurasi sebelum menerima pesanan
 
-1. Buka `script.js`.
-2. Isi `STORE_CONFIG.whatsappNumber` dengan nomor WhatsApp toko format internasional tanpa tanda plus, contoh `62812xxxxxxxx`.
-3. Ganti seluruh data produk contoh pada array `products` dengan data resmi V2N: nama, kategori, harga, warna, foto, deskripsi, dan ukuran.
-4. Ganti URL foto eksternal dengan foto produk resmi yang sudah mendapat izin.
-5. Periksa kembali seluruh harga, ukuran, dan informasi toko sebelum dipublikasikan.
+1. Isi `STORE_CONFIG.whatsappNumber` pada `script.js` dengan nomor WhatsApp toko format internasional tanpa tanda plus, misalnya `62812xxxxxxxx`.
+2. Ganti seluruh data contoh pada array `products` dengan nama, kategori, harga, warna, foto, deskripsi, dan ukuran resmi.
+3. Verifikasi setiap foto produk, harga, ukuran, dan informasi ketersediaan.
+4. Pastikan kebijakan pengiriman, pembayaran, retur, dan kontak toko sudah benar.
+5. Uji proses pemesanan di perangkat mobile dan desktop sebelum website dipublikasikan.
 
-## Data dan database
+## Batasan versi saat ini
 
-Saat ini katalog disimpan di array `products` dan keranjang disimpan secara lokal pada browser pengunjung. Belum ada database, autentikasi admin, sinkronisasi stok, atau pembayaran otomatis. Struktur ini sengaja dibuat agar integrasi API/database dapat ditambahkan pada tahap berikutnya.
+Ini masih storefront demo/front-end. Katalog produk berada di array JavaScript dan keranjang tersimpan di browser pengunjung melalui localStorage. Belum tersedia database, dashboard admin, autentikasi, sinkronisasi stok, manajemen pesanan, atau pembayaran otomatis.
 
-## Catatan konten
+Nomor WhatsApp masih kosong dan data produk yang ada merupakan data contoh. Karena itu, website belum boleh diperlakukan sebagai toko live untuk menerima pembayaran atau menjanjikan ketersediaan barang sampai data resmi dan konfigurasi toko dimasukkan.
 
-Nama produk, harga, deskripsi, ukuran, dan foto yang tersedia saat ini adalah konten awal untuk pengembangan tampilan, bukan data katalog resmi V2N SUPPLY.CO. Jangan gunakan harga atau stok contoh sebagai informasi penjualan aktual.
+## Teknologi
+
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- Browser localStorage
+- Google Fonts dan Material Symbols
